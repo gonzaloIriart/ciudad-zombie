@@ -20,7 +20,26 @@ var Juego = {
   obstaculosCarretera: [
     /*Aca se van a agregar los obstaculos visibles. Tenemos una valla horizontal
     de ejemplo, pero podras agregar muchos mas. */
-    new Obstaculo('imagenes/valla_horizontal.png', 70, 430, 30, 30, 1)
+    new Obstaculo('imagenes/valla_horizontal.png', 70, 430, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 100, 430, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 130, 430, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 130, 100, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 160, 100, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 500, 400, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 480, 250, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 810, 400, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 850, 250, 30, 30, 1),
+    new Obstaculo('imagenes/valla_vertical.png', 480, 440, 30, 30, 1),
+    new Obstaculo('imagenes/valla_vertical.png', 480, 470, 30, 30, 1),    
+    new Obstaculo('imagenes/valla_vertical.png', 190, 460, 30, 30, 1),
+    new Obstaculo('imagenes/bache.png', 300, 230, 30, 30, 1),
+    new Obstaculo('imagenes/bache.png', 160, 260, 30, 30, 1),
+    new Obstaculo('imagenes/bache.png', 500, 460, 30, 30, 1),
+    new Obstaculo('imagenes/bache.png', 780, 460, 30, 30, 1),
+    new Obstaculo('imagenes/bache.png', 600, 85, 30, 30, 1),
+    new Obstaculo('imagenes/auto_verde_abajo.png', 300, 100, 15, 30, 1),
+    new Obstaculo('imagenes/auto_verde_abajo.png', 800, 100, 15, 30, 1),
+    new Obstaculo('imagenes/auto_verde_derecha.png', 100, 400, 30, 15, 1),
 
   ],
   /* Estos son los bordes con los que se puede chocar, por ejemplo, la vereda.
@@ -88,6 +107,7 @@ Juego.comenzar = function() {
   /* El bucle principal del juego se llamara continuamente para actualizar
   los movimientos y el pintado de la pantalla. Sera el encargado de calcular los
   ataques, colisiones, etc*/
+  Dibujante.dibujarRectangulo('red',100,100,100,50)
   this.buclePrincipal();
 };
 
@@ -115,24 +135,30 @@ Juego.capturarMovimiento = function(tecla) {
   // El movimiento esta determinado por la velocidad del jugador
   if (tecla == 'izq') {
     movX = -velocidad;
+    this.jugador.mover('imagenes/auto_rojo_izquierda.png',30,15); 
   }
   if (tecla == 'arriba') {
-    movY = -velocidad;
+    movY = -velocidad;    
+    this.jugador.mover('imagenes/auto_rojo_arriba.png',15,30);   
   }
   if (tecla == 'der') {
     movX = velocidad;
+    this.jugador.mover('imagenes/auto_rojo_derecha.png',30,15);
   }
   if (tecla == 'abajo') {
     movY = velocidad;
+    this.jugador.mover('imagenes/auto_rojo_abajo.png',15,30);
   }
 
   // Si se puede mover hacia esa posicion hay que hacer efectivo este movimiento
   if (this.chequearColisiones(movX + this.jugador.x, movY + this.jugador.y)) {
     /* Aca tiene que estar la logica para mover al jugador invocando alguno
     de sus metodos  */
-
+    this.jugador.x = this.jugador.x + movX;
+    this.jugador.y = this.jugador.y + movY;
     /* COMPLETAR */
   }
+
 };
 
 Juego.dibujar = function() {
@@ -145,6 +171,8 @@ Juego.dibujar = function() {
   /* Aca hay que agregar la logica para poder dibujar al jugador principal
   utilizando al dibujante y los metodos que nos brinda.
   "Dibujante dibuja al jugador" */
+
+  Dibujante.dibujarEntidad(Jugador)
 
   /* Completar */
 
@@ -185,6 +213,7 @@ Juego.calcularAtaques = function() {
     if (this.intersecan(enemigo, this.jugador, this.jugador.x, this.jugador.y)) {
       /* Si el enemigo colisiona debe empezar su ataque
       COMPLETAR */
+
     } else {
       /* Sino, debe dejar de atacar
       COMPLETAR */
@@ -202,7 +231,7 @@ Juego.chequearColisiones = function(x, y) {
     if (this.intersecan(obstaculo, this.jugador, x, y)) {
 
       /*COMPLETAR, obstaculo debe chocar al jugador*/
-
+      obstaculo.chocar(this.jugador);
       puedeMoverse = false
     }
   }, this)
