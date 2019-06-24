@@ -27,18 +27,18 @@ var Juego = {
     new Obstaculo('imagenes/valla_horizontal.png', 160, 100, 30, 30, 1),
     new Obstaculo('imagenes/valla_horizontal.png', 500, 400, 30, 30, 1),
     new Obstaculo('imagenes/valla_horizontal.png', 480, 250, 30, 30, 1),
-    new Obstaculo('imagenes/valla_horizontal.png', 810, 400, 30, 30, 1),
+    new Obstaculo('imagenes/valla_horizontal.png', 810, 420, 30, 30, 1),
     new Obstaculo('imagenes/valla_horizontal.png', 850, 250, 30, 30, 1),
     new Obstaculo('imagenes/valla_vertical.png', 480, 440, 30, 30, 1),
     new Obstaculo('imagenes/valla_vertical.png', 480, 470, 30, 30, 1),    
     new Obstaculo('imagenes/valla_vertical.png', 190, 460, 30, 30, 1),
-    new Obstaculo('imagenes/bache.png', 300, 230, 30, 30, 1),
+    new Obstaculo('imagenes/bache.png', 250, 230, 30, 30, 1),
     new Obstaculo('imagenes/bache.png', 160, 260, 30, 30, 1),
     new Obstaculo('imagenes/bache.png', 500, 460, 30, 30, 1),
     new Obstaculo('imagenes/bache.png', 780, 460, 30, 30, 1),
-    new Obstaculo('imagenes/bache.png', 600, 85, 30, 30, 1),
-    new Obstaculo('imagenes/auto_verde_abajo.png', 300, 100, 15, 30, 1),
-    new Obstaculo('imagenes/auto_verde_abajo.png', 800, 100, 15, 30, 1),
+    new Obstaculo('imagenes/bache.png', 600, 75, 30, 30, 1),
+    new Obstaculo('imagenes/auto_verde_abajo.png', 280, 100, 15, 30, 1),
+    new Obstaculo('imagenes/auto_verde_abajo.png', 770, 150, 15, 30, 1),
     new Obstaculo('imagenes/auto_verde_derecha.png', 100, 400, 30, 15, 1),
 
   ],
@@ -63,7 +63,13 @@ var Juego = {
   ],
   // Los enemigos se agregaran en este arreglo.
   enemigos: [
-
+    new ZombieCaminante('imagenes/zombie1.png',300,100,10,10,1.2,{desdeX:0,hastaX:961,desdeY:0,hastaY:577}),
+    new ZombieCaminante('imagenes/zombie2.png',100,300,10,10,0.8,{desdeX:0,hastaX:961,desdeY:0,hastaY:577}),
+    new ZombieCaminante('imagenes/zombie3.png',500,0,10,10,1,{desdeX:0,hastaX:961,desdeY:0,hastaY:577}),
+    new ZombieCaminante('imagenes/zombie4.png',900,400,10,10,1.5,{desdeX:0,hastaX:961,desdeY:0,hastaY:577}),
+    new ZombieConductor('imagenes/tren_vertical.png',644,0,30,90,2.5,{desdeX:0,hastaX:961,desdeY:0,hastaY:577},'v'),
+    new ZombieConductor('imagenes/tren_vertical.png',678,0,30,90,3,{desdeX:0,hastaX:961,desdeY:0,hastaY:577},'v'),
+    new ZombieConductor('imagenes/tren_horizontal.png',400,322,90,30,5,{desdeX:0,hastaX:961,desdeY:0,hastaY:577},'h')
   ]
 
 }
@@ -107,7 +113,6 @@ Juego.comenzar = function() {
   /* El bucle principal del juego se llamara continuamente para actualizar
   los movimientos y el pintado de la pantalla. Sera el encargado de calcular los
   ataques, colisiones, etc*/
-  Dibujante.dibujarRectangulo('red',100,100,100,50)
   this.buclePrincipal();
 };
 
@@ -164,6 +169,7 @@ Juego.capturarMovimiento = function(tecla) {
 Juego.dibujar = function() {
   // Borrar el fotograma actual
   Dibujante.borrarAreaDeJuego();
+  
   //Se pinta la imagen de fondo segun el estado del juego
   this.dibujarFondo();
 
@@ -173,6 +179,16 @@ Juego.dibujar = function() {
   "Dibujante dibuja al jugador" */
 
   Dibujante.dibujarEntidad(Jugador)
+  
+  //Pintada de llegada
+
+  for(let i = 0; i<130;i+=10){
+    if(i%20==0){
+      Dibujante.dibujarRectangulo('black', 758+i, 510, 10, 48);
+    }else{
+      Dibujante.dibujarRectangulo('white', 758+i, 510, 10, 48);
+    }
+  }
 
   /* Completar */
 
@@ -183,7 +199,7 @@ Juego.dibujar = function() {
 
   // Se recorren los enemigos pintandolos
   this.enemigos.forEach(function(enemigo) {
-    /* Completar */
+    Dibujante.dibujarEntidad(enemigo);
   });
 
   // El dibujante dibuja las vidas del jugador
@@ -201,8 +217,10 @@ Juego.dibujar = function() {
 un recorrido por los enemigos para dibujarlos en pantalla ahora habra que hacer
 una funcionalidad similar pero para que se muevan.*/
 Juego.moverEnemigos = function() {
-  /* COMPLETAR */
-};
+  this.enemigos.forEach((enemigo)=>
+  enemigo.mover())
+}
+
 
 /* Recorre los enemigos para ver cual esta colisionando con el jugador
 Si colisiona empieza el ataque el zombie, si no, deja de atacar.
@@ -213,10 +231,14 @@ Juego.calcularAtaques = function() {
     if (this.intersecan(enemigo, this.jugador, this.jugador.x, this.jugador.y)) {
       /* Si el enemigo colisiona debe empezar su ataque
       COMPLETAR */
+      enemigo.comenzarAtaque(this.jugador);
+      enemigo.velocidad = 0;
 
     } else {
       /* Sino, debe dejar de atacar
       COMPLETAR */
+      enemigo.dejarDeAtacar();
+
     }
   }, this);
 };
@@ -257,8 +279,9 @@ Juego.intersecan = function(elemento1, elemento2, x, y) {
 Juego.dibujarFondo = function() {
   // Si se termino el juego hay que mostrar el mensaje de game over de fondo
   if (this.terminoJuego()) {
-    Dibujante.dibujarImagen('imagenes/mensaje_gameover.png', 0, 5, this.anchoCanvas, this.altoCanvas);
     document.getElementById('reiniciar').style.visibility = 'visible';
+    Dibujante.dibujarImagen('imagenes/mensaje_gameover.png', 0, 5, this.anchoCanvas, this.altoCanvas);
+    
   }
 
   // Si se gano el juego hay que mostrar el mensaje de ganoJuego de fondo
